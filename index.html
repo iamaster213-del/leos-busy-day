@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leo's Busy Day</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: a bright toy-box world. Sky ground, chunky white panels with a pressed "toy button" shadow, big tappable picture cards. Single bright theme by choice. */
+:root{
+  --sky:#DCEFFF; --ink:#22305A; --muted:#566690; --card:#FFFFFF; --soft:#EEF6FF; --edge:#BFD9F2;
+  --sun:#FFC83D; --sun-sh:#D99A12; --grass:#3FB36F; --grass-sh:#2B8A52; --coral:#FF6F61; --coral-sh:#CC4E42;
+  --grape:#8C7BEF; --grape-sh:#6656C9; --ok:#2FB36A; --bad:#F0544F;
+  --f-display:"Baloo 2","Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{
+  margin:0; background:var(--sky); color:var(--ink); font-family:var(--f-body); font-size:18px; font-weight:700;
+  background-image:radial-gradient(circle at 8% 0%,#FFFFFF 0,transparent 28%),radial-gradient(circle at 95% 6%,#FFF4CF 0,transparent 22%);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:980px;margin:0 auto;padding-block:10px 36px;display:flex;flex-direction:column;gap:18px}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:4px solid var(--grape);outline-offset:3px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+.brand svg{width:46px;height:46px;flex:none}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,4vw,30px);line-height:1}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border-radius:999px;padding:5px 14px 5px 8px;font-family:var(--f-display);font-weight:800;font-size:22px;box-shadow:0 4px 0 var(--edge);font-variant-numeric:tabular-nums}
+.pill svg{width:28px;height:28px}
+.pill.bump{animation:bump .5s}
+.iconbtn{width:48px;height:48px;border-radius:50%;border:0;background:var(--card);box-shadow:0 4px 0 var(--edge);display:grid;place-items:center;cursor:pointer;flex:none}
+.iconbtn svg{width:26px;height:26px}
+
+/* shared */
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:0 7px 0 var(--edge)}
+.art{border-radius:20px;overflow:hidden;background:#fff;aspect-ratio:4/3;width:100%;max-width:100%}
+.art svg{display:block;width:100%;height:100%}
+.eyebrow{display:block;font-size:14px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:22px;border:0;border-radius:18px;padding:10px 22px;background:var(--sun);color:var(--ink);box-shadow:0 5px 0 var(--sun-sh);cursor:pointer;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--sun-sh)}
+.btn.green{background:var(--grass);color:#fff;box-shadow:0 5px 0 var(--grass-sh)}
+.btn.white{background:var(--soft);box-shadow:0 5px 0 var(--edge)}
+.btn svg{width:26px;height:26px}
+.progress{display:flex;gap:6px;margin-bottom:14px}
+.progress i{flex:1;height:12px;border-radius:6px;background:#E3EEF9}
+.progress i.on{background:var(--grass)}
+.progress i.now{background:var(--sun)}
+.prompt{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.speak{width:66px;height:66px;border-radius:50%;border:0;background:var(--grape);color:#fff;box-shadow:0 5px 0 var(--grape-sh);display:grid;place-items:center;cursor:pointer;flex:none}
+.speak:active{transform:translateY(4px);box-shadow:0 1px 0 var(--grape-sh)}
+.speak svg{width:32px;height:32px}
+.prompt > div{min-width:0}
+.prompt strong{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,5vw,42px);line-height:1.05;display:block;text-wrap:balance}
+
+/* home */
+.hero{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:center}
+.hero h1{font-family:var(--f-display);font-weight:800;font-size:clamp(38px,7vw,62px);line-height:.95;margin:4px 0 10px;text-wrap:balance}
+.hero p{font-size:20px;margin:0 0 16px;color:var(--muted);max-width:30ch}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.mode{border:0;background:var(--card);border-radius:24px;padding:12px 12px 16px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:8px;box-shadow:0 7px 0 var(--c);transition:transform .12s}
+.mode:hover{transform:translateY(-3px)}
+.mode:active{transform:translateY(4px);box-shadow:0 2px 0 var(--c)}
+.mode .art{border:4px solid var(--c)}
+.mode h3{font-family:var(--f-display);font-weight:800;font-size:24px;margin:4px 0 0;line-height:1.05}
+.mode p{margin:0;color:var(--muted);font-size:16px;line-height:1.3}
+
+/* learn */
+.learn{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:center}
+.learn .art{animation:pop .35s ease-out}
+.phrase{font-family:var(--f-display);font-weight:800;font-size:clamp(36px,6.4vw,60px);line-height:1.02;margin:4px 0 14px;display:flex;flex-wrap:wrap;gap:0 .26em}
+.word{border:0;background:none;padding:0 3px;border-radius:12px;cursor:pointer;line-height:1.05}
+.word:hover{background:#FFF1BF}
+.word.verb{color:var(--coral)}
+.timechip{display:inline-flex;align-items:center;gap:12px;border:0;background:var(--soft);border-radius:20px;padding:8px 18px 8px 8px;cursor:pointer;text-align:left;box-shadow:0 4px 0 var(--edge)}
+.timechip svg{width:62px;height:62px;flex:none}
+.timechip b{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1;display:block;font-variant-numeric:tabular-nums}
+.timechip span{color:var(--muted);font-size:17px}
+.learnbtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.navrow{display:flex;align-items:center;gap:12px;margin-top:18px}
+.dots{display:flex;gap:7px;flex-wrap:wrap;flex:1;justify-content:center}
+.dots i{width:12px;height:12px;border-radius:50%;background:#D5E3F3}
+.dots i.on{background:var(--coral)}
+.arrow{width:58px;height:58px;border-radius:50%;border:0;background:var(--sun);box-shadow:0 5px 0 var(--sun-sh);cursor:pointer;display:grid;place-items:center;flex:none}
+.arrow:disabled{opacity:.35;cursor:default}
+.arrow svg{width:28px;height:28px}
+
+/* pick cards */
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pick{border:0;padding:0;background:none;cursor:pointer;border-radius:24px;display:flex;flex-direction:column;gap:6px;transition:transform .1s;text-align:center}
+.pick .art{border:5px solid #E3EEF9;box-shadow:0 6px 0 #C9DDF1}
+.pick:hover .art{border-color:var(--sun)}
+.pick.right .art{border-color:var(--ok);box-shadow:0 6px 0 var(--grass-sh)}
+.pick.right{animation:bump .5s}
+.pick.wrong{animation:shake .45s}
+.pick.wrong .art{border-color:var(--bad);opacity:.55}
+
+/* order */
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.slot{border:3px dashed #B9CDE6;border-radius:18px;padding:6px;display:flex;flex-direction:column;gap:4px;align-items:center;background:var(--soft);min-width:0}
+.slot .lbl{font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1.2}
+.slot .slot-art{width:100%;aspect-ratio:4/3;border-radius:12px;display:grid;place-items:center;color:#AFC3DD;font-family:var(--f-display);font-size:30px;font-weight:800}
+.slot.filled{border-style:solid;border-color:var(--grass);background:#E7F8EE}
+.slot.filled .slot-art{animation:pop .3s ease-out;overflow:hidden}
+.slot .slot-art svg{width:100%;height:100%;display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.cap{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}
+.cap b{font-size:17px}
+.cap em{font-style:normal;font-family:var(--f-display);font-weight:800;background:var(--soft);border-radius:999px;padding:0 10px;font-size:17px;font-variant-numeric:tabular-nums}
+.card.used{visibility:hidden}
+.after{display:flex;justify-content:center;margin-top:16px}
+
+/* when */
+.when{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:center}
+.when strong.big{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,5vw,46px);line-height:1.05;display:block;margin:4px 0 14px}
+.bins{display:grid;gap:12px}
+.bin{display:flex;align-items:center;gap:14px;border:0;border-radius:20px;padding:10px 18px 10px 12px;font-family:var(--f-display);font-weight:800;font-size:28px;cursor:pointer;background:var(--b);box-shadow:0 5px 0 var(--bs);text-align:left}
+.bin:active{transform:translateY(4px);box-shadow:0 1px 0 var(--bs)}
+.bin svg{width:52px;height:52px;flex:none}
+.bin.wrong{animation:shake .45s;opacity:.5}
+.bin.right{outline:5px solid var(--ok);outline-offset:2px}
+.sentence{min-height:1.4em;margin-top:14px;font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--grass-sh)}
+
+/* done */
+.done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px}
+.done .art{max-width:420px}
+.done h2{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,8vw,64px);margin:0;line-height:1}
+.done p{margin:0;font-size:20px;color:var(--muted)}
+.starrow{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.starrow svg{width:44px;height:44px}
+.starrow .lit{animation:pop .4s ease-out backwards}
+.donebtns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+/* feedback */
+#cheer{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 74px);transform:translateX(-50%) scale(0);background:var(--grass);color:#fff;font-family:var(--f-display);font-weight:800;font-size:34px;padding:6px 28px;border-radius:999px;box-shadow:0 6px 0 var(--grass-sh);pointer-events:none;z-index:50;transition:transform .28s cubic-bezier(.3,1.6,.5,1);white-space:nowrap}
+#cheer.show{transform:translateX(-50%) scale(1)}
+#cheer.bad{background:var(--coral);box-shadow:0 6px 0 var(--coral-sh)}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+@keyframes bump{0%,100%{transform:scale(1)}40%{transform:scale(1.08)}}
+
+@media (max-width:860px){.modes{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:760px){
+  .hero,.learn,.when{grid-template-columns:1fr}
+  .cards{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:520px){
+  .choices{gap:8px}
+  .pick .art{border-width:4px}
+  .slot .lbl{font-size:15px}
+  .slots{gap:6px}
+  .cap b{font-size:15px}
+  .bin{font-size:24px}
+  .mode h3{font-size:20px}
+  .mode p{font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <button class="brand" data-act="home" aria-label="Leo's Busy Day, home">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FF9F1C" stroke-width="3.5" stroke-linecap="round"><path d="M24 3v6M24 39v6M3 24h6M39 24h6M9 9l4 4M35 35l4 4M39 9l-4 4M13 35l-4 4"/></g><circle cx="24" cy="24" r="12" fill="#FFC83D"/><circle cx="20" cy="22" r="1.8" fill="#22305A"/><circle cx="28" cy="22" r="1.8" fill="#22305A"/><path d="M19 27q5 5 10 0" stroke="#22305A" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <b>Leo's Busy Day</b>
+    </button>
+    <span class="pill" id="pill" aria-label="Stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 17.2l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFC83D" stroke="#E6A019" stroke-width="1.5" stroke-linejoin="round"/></svg><span id="starCount">0</span></span>
+    <button class="iconbtn" id="muteBtn" data-act="mute" aria-label="Sound on"></button>
+    <button class="iconbtn" id="homeBtn" data-act="home" aria-label="Home" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="#22305A"/></svg></button>
+  </header>
+  <main id="screen"></main>
+</div>
+<div id="cheer" aria-live="polite"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const screen = $('#screen');
+const SKIN = '#F6C9A4';
+const INK = '#22305A';
+
+/* ---------- drawing helpers ---------- */
+const W = c => `<rect width="240" height="180" fill="${c}"/>`;
+const F = (c, y=140) => `<rect y="${y}" width="240" height="${180-y}" fill="${c}"/>`;
+const bub = (x,y,r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#FFFFFF" stroke="#A9DDF5" stroke-width="1.2"/>`;
+const drop = (x,y) => `<path d="M${x},${y} q-5,7 0,10 q5,-3 0,-10Z" fill="#38BDF8"/>`;
+const cloud = (x,y) => `<g fill="#FFFFFF"><ellipse cx="${x}" cy="${y}" rx="17" ry="8"/><circle cx="${x-6}" cy="${y-5}" r="7"/><circle cx="${x+5}" cy="${y-7}" r="9"/></g>`;
+const flower = (x,y,c) => `<g transform="translate(${x} ${y})"><line y2="10" stroke="#2B8A52" stroke-width="2"/><circle cx="-3" cy="-2" r="3" fill="${c}"/><circle cx="3" cy="-2" r="3" fill="${c}"/><circle cx="0" cy="-5" r="3" fill="${c}"/><circle cx="0" cy="1" r="3" fill="${c}"/><circle cx="0" cy="-2" r="2" fill="#FFD43B"/></g>`;
+function star(x,y,r,c){let p=[];for(let i=0;i<10;i++){const rr=i%2?r*.45:r;const a=(-90+i*36)*Math.PI/180;p.push((x+Math.cos(a)*rr).toFixed(1)+','+(y+Math.sin(a)*rr).toFixed(1));}return `<polygon points="${p.join(' ')}" fill="${c}"/>`;}
+function tiles(c){let s='';for(let x=24;x<240;x+=24)s+=`<line x1="${x}" y1="0" x2="${x}" y2="180" stroke="${c}" stroke-width="1.5"/>`;for(let y=24;y<180;y+=24)s+=`<line x1="0" y1="${y}" x2="240" y2="${y}" stroke="${c}" stroke-width="1.5"/>`;return s;}
+const tshirt = (x,y,c,s) => `<path transform="translate(${x} ${y}) scale(${s})" d="M-12,-20 Q0,-13 12,-20 L24,-12 L18,-2 L12,-6 L12,20 L-12,20 L-12,-6 L-18,-2 L-24,-12Z" fill="${c}"/>`;
+const hand = (x,y,c=SKIN) => `<circle cx="${x}" cy="${y}" r="6.5" fill="${c}"/>`;
+
+function clockFace(cx,cy,r,h,m){
+  let t='';
+  for(let k=0;k<12;k++){const a=k*30*Math.PI/180;const big=k%3===0;t+=`<circle cx="${(Math.sin(a)*r*.76).toFixed(1)}" cy="${(-Math.cos(a)*r*.76).toFixed(1)}" r="${(big?r*.08:r*.045).toFixed(2)}" fill="${INK}"/>`;}
+  const ha=(h%12+m/60)*30, ma=m*6;
+  return `<g transform="translate(${cx} ${cy})"><circle r="${r}" fill="#FFFFFF" stroke="#FF6F61" stroke-width="${r*.13}"/>${t}<line x2="0" y2="${-r*.44}" stroke="${INK}" stroke-width="${r*.12}" stroke-linecap="round" transform="rotate(${ha})"/><line x2="0" y2="${-r*.66}" stroke="${INK}" stroke-width="${r*.075}" stroke-linecap="round" transform="rotate(${ma})"/><circle r="${r*.09}" fill="${INK}"/></g>`;
+}
+
+function windowA(x,y,mode){
+  const glass={sunrise:'#FFE3A3',day:'#9ED8F7',afternoon:'#FFD59A',evening:'#F7A07A',night:'#22306B'}[mode];
+  let c='';
+  if(mode==='sunrise') c=`<circle cx="18" cy="38" r="11" fill="#FFB52E"/><ellipse cx="40" cy="14" rx="8" ry="3.5" fill="#FFFFFF"/>`;
+  if(mode==='day') c=`<circle cx="15" cy="14" r="7" fill="#FFD43B"/><ellipse cx="38" cy="32" rx="9" ry="4" fill="#FFFFFF"/>`;
+  if(mode==='afternoon') c=`<circle cx="36" cy="22" r="8" fill="#FF9F1C"/>`;
+  if(mode==='evening') c=`<circle cx="28" cy="42" r="12" fill="#FF6B3D"/><circle cx="10" cy="10" r="1.5" fill="#FFFFFF"/><circle cx="46" cy="8" r="1.2" fill="#FFFFFF"/>`;
+  if(mode==='night') c=`<circle cx="36" cy="15" r="8" fill="#FFF1A8"/><circle cx="40" cy="12" r="7" fill="${glass}"/><circle cx="11" cy="11" r="1.5" fill="#FFFFFF"/><circle cx="19" cy="31" r="1.2" fill="#FFFFFF"/><circle cx="45" cy="35" r="1.5" fill="#FFFFFF"/>`;
+  return `<g transform="translate(${x} ${y})"><rect x="-3" y="-3" width="62" height="52" rx="6" fill="#FFFFFF"/><svg x="1" y="1" width="54" height="44" viewBox="0 0 54 44"><rect width="54" height="44" fill="${glass}"/>${c}</svg><rect x="25.5" y="1" width="5" height="44" fill="#FFFFFF"/><rect x="1" y="20.5" width="54" height="5" fill="#FFFFFF"/></g>`;
+}
+
+/* Leo (and friends): head centre at (0,0), radius 26 */
+function kid(x,y,o={}){
+  const s=o.s||1, skin=o.skin||SKIN, hair=o.hair||'#7B4A2A', shirt=o.shirt||'#3B82F6', pants=o.pants||'#2F3E66';
+  const hands=o.hands||[[-26,58],[26,58]];
+  let g=`<g transform="translate(${x} ${y}) scale(${s})${o.rot?` rotate(${o.rot})`:''}">`;
+  if(o.legs){const sh=o.shoes||'#E2483D';g+=`<rect x="-20" y="60" width="17" height="40" rx="7" fill="${pants}"/><rect x="3" y="60" width="17" height="40" rx="7" fill="${pants}"/><ellipse cx="-13" cy="101" rx="13" ry="6" fill="${sh}"/><ellipse cx="13" cy="101" rx="13" ry="6" fill="${sh}"/>`;}
+  if(o.pack) g+=`<rect x="-32" y="26" width="64" height="40" rx="12" fill="${o.pack}"/>`;
+  g+=`<path d="M-23,68 L-23,40 Q-23,22 0,22 Q23,22 23,40 L23,68 Q0,74 -23,68Z" fill="${shirt}"/>`;
+  if(o.pack) g+=`<path d="M-14,25 L-13,62 M14,25 L13,62" stroke="#C98A12" stroke-width="5" stroke-linecap="round"/>`;
+  if(o.pigtails) g+=`<circle cx="-31" cy="-6" r="10" fill="${hair}"/><circle cx="31" cy="-6" r="10" fill="${hair}"/><circle cx="-24" cy="-10" r="3" fill="#FFC83D"/><circle cx="24" cy="-10" r="3" fill="#FFC83D"/>`;
+  g+=`<circle cx="-25" cy="2" r="6" fill="${skin}"/><circle cx="25" cy="2" r="6" fill="${skin}"/><circle r="26" fill="${skin}"/>`;
+  g+=`<path d="M-26,-2 C-30,-34 30,-36 26,-2 C22,-14 12,-19 2,-17 C-8,-22 -20,-14 -26,-2Z" fill="${hair}"/>`;
+  if(o.eyes==='closed') g+=`<path d="M-13,-1 q4,4 8,0 M5,-1 q4,4 8,0" stroke="${INK}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  else g+=`<circle cx="-9" cy="-1" r="3.7" fill="${INK}"/><circle cx="9" cy="-1" r="3.7" fill="${INK}"/><circle cx="-8" cy="-2.4" r="1.3" fill="#FFFFFF"/><circle cx="10" cy="-2.4" r="1.3" fill="#FFFFFF"/>`;
+  g+=`<circle cx="-15" cy="8" r="4.2" fill="#FF8FA3" opacity=".5"/><circle cx="15" cy="8" r="4.2" fill="#FF8FA3" opacity=".5"/>`;
+  const m=o.mouth||'smile';
+  if(m==='smile') g+=`<path d="M-8,9 Q0,17 8,9" stroke="${INK}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  if(m==='yawn') g+=`<ellipse cx="0" cy="12" rx="5" ry="7" fill="#B83A52"/>`;
+  if(m==='cheer') g+=`<path d="M-9,8 Q0,22 9,8Z" fill="#B83A52"/>`;
+  if(m==='eat') g+=`<ellipse cx="0" cy="12" rx="4.5" ry="3.8" fill="#B83A52"/>`;
+  if(m==='teeth') g+=`<rect x="-7" y="8" width="14" height="7" rx="3" fill="#FFFFFF" stroke="#B83A52" stroke-width="1.6"/>`;
+  if(!o.noArms) hands.forEach(([hx,hy],i)=>{const sx=i?17:-17;g+=`<path d="M${sx},34 L${hx},${hy}" stroke="${shirt}" stroke-width="11" stroke-linecap="round"/><circle cx="${hx}" cy="${hy}" r="6.5" fill="${skin}"/>`;});
+  return g+'</g>';
+}
+
+/* ---------- the scenes ---------- */
+const counter = `<rect x="64" y="130" width="176" height="50" fill="#FFFFFF"/><rect x="60" y="126" width="180" height="8" rx="4" fill="#B9C6DA"/>`;
+const SCENES = {
+  wake: () => W('#FFF0C7')+F('#E8B98A',142)+windowA(22,24,'sunrise')
+    +`<rect x="94" y="28" width="28" height="22" rx="3" fill="#8C7BEF"/><path d="M98,46 l6,-9 l5,5 l4,-4 l5,8z" fill="#FFFFFF"/>`
+    +`<rect x="82" y="108" width="36" height="36" rx="4" fill="#C07A3E"/><rect x="87" y="120" width="26" height="4" rx="2" fill="#9A5B2A"/>`
+    +`<g transform="translate(100 94)"><path d="M-9,-8 l-6,-5 M9,-8 l6,-5" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/><circle cx="-8" cy="-10" r="4.5" fill="#FF6F61"/><circle cx="8" cy="-10" r="4.5" fill="#FF6F61"/><circle r="11" fill="#FF6F61"/><circle r="8" fill="#FFFFFF"/><path d="M0,0 L0,-6 M0,0 L-2,3.5" stroke="${INK}" stroke-width="1.8" stroke-linecap="round"/><path d="M-17,-3 q-3,4 0,8 M17,-3 q3,4 0,8 M-22,-6 q-5,7 0,14 M22,-6 q5,7 0,14" stroke="#FF6F61" stroke-width="2" fill="none" stroke-linecap="round"/></g>`
+    +`<rect x="132" y="66" width="12" height="80" rx="5" fill="#B5651D"/><rect x="222" y="96" width="10" height="50" rx="4" fill="#B5651D"/><rect x="138" y="112" width="88" height="22" rx="6" fill="#FFFFFF"/><ellipse cx="166" cy="106" rx="20" ry="8" fill="#FFFFFF" stroke="#E3E8F0" stroke-width="2"/>`
+    +kid(180,74,{s:.8,shirt:'#A78BFA',eyes:'closed',mouth:'yawn',hands:[[-34,-30],[34,-30]]})
+    +`<path d="M142,110 Q182,100 226,108 L226,138 Q184,144 142,138Z" fill="#5FA8F5"/>`+star(162,124,5,'#FFFFFF')+star(190,120,4,'#FFFFFF')+star(212,128,5,'#FFFFFF'),
+
+  teeth: () => W('#D6F3EF')+tiles('#BFE6E0')
+    +`<ellipse cx="52" cy="62" rx="26" ry="32" fill="#E6F6FF" stroke="#9AA9C7" stroke-width="5"/><path d="M38,48 q6,-9 15,-9" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round"/>`
+    +kid(140,70,{shirt:'#FB923C',mouth:'teeth',hands:[[-26,58],[16,16]]})
+    +`<line x1="137" y1="83" x2="178" y2="97" stroke="#22C55E" stroke-width="5" stroke-linecap="round"/><rect x="127" y="79" width="11" height="6" rx="2" fill="#FFFFFF" stroke="#9AA9C7" stroke-width="1.5"/>`+hand(156,86)
+    +bub(124,90,3.8)+bub(146,95,3)+bub(120,82,2.6)+bub(132,97,2.6)+bub(112,70,2)
+    +counter
+    +`<path d="M78,108 L96,108 L94,126 L80,126Z" fill="#FF6F61"/><line x1="84" y1="108" x2="81" y2="94" stroke="#8C7BEF" stroke-width="4" stroke-linecap="round"/><line x1="90" y1="108" x2="95" y2="95" stroke="#FFC83D" stroke-width="4" stroke-linecap="round"/>`
+    +`<g transform="translate(196 116) rotate(-8)"><rect width="32" height="10" rx="4" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2"/><rect x="-6" y="2" width="7" height="6" rx="1" fill="#3B82F6"/><rect x="9" y="3" width="15" height="4" rx="2" fill="#FF6F61"/></g>`,
+
+  face: () => W('#D6F3EF')+tiles('#BFE6E0')
+    +`<rect x="184" y="34" width="46" height="4" rx="2" fill="#9AA9C7"/><rect x="190" y="36" width="34" height="52" rx="4" fill="#3FB36F"/><rect x="190" y="72" width="34" height="5" fill="#FFFFFF"/><rect x="190" y="80" width="34" height="3" fill="#FFFFFF"/>`
+    +kid(110,70,{shirt:'#F43F5E',eyes:'closed',mouth:'smile',hands:[[-16,12],[16,12]]})
+    +bub(99,58,4)+bub(117,55,3.4)+bub(108,49,3)+bub(124,62,2.6)+bub(94,68,2.4)
+    +drop(82,58)+drop(140,50)+drop(88,92)+drop(134,98)+drop(148,74)+drop(72,80)
+    +counter
+    +`<rect x="160" y="108" width="8" height="20" fill="#9AA9C7"/><path d="M164,110 L178,110 Q184,110 184,116" stroke="#9AA9C7" stroke-width="7" fill="none" stroke-linecap="round"/><rect x="181" y="118" width="6" height="12" rx="3" fill="#7DD3FC"/>`,
+
+  dress: () => W('#E3E6FF')+F('#C9A07A',138)
+    +`<rect x="12" y="26" width="76" height="114" rx="6" fill="#A86B32"/><rect x="18" y="32" width="40" height="102" rx="3" fill="#5B3A1E"/><rect x="60" y="32" width="22" height="102" rx="3" fill="#C2884A"/><circle cx="64" cy="84" r="2.5" fill="#FFD36E"/><line x1="20" y1="42" x2="56" y2="42" stroke="#D6D3D1" stroke-width="2.5"/><path d="M28,42 v5 M47,42 v5" stroke="#D6D3D1" stroke-width="2"/>`
+    +tshirt(28,60,'#3FB36F',.5)+tshirt(47,60,'#FFC83D',.5)
+    +`<ellipse cx="150" cy="150" rx="48" ry="9" fill="#FF9F8F"/>`
+    +kid(146,48,{s:.85,legs:true,shirt:'#FDE68A',pants:'#3B5BA9',hands:[[-26,54],[46,30]]})
+    +tshirt(186,93,'#FF6F61',.9)+`<circle cx="186" cy="74" r="5.5" fill="${SKIN}"/>`+star(186,95,6,'#FFFFFF')
+    +`<g fill="#3B82F6"><path d="M200,146 q0,-8 8,-8 l6,0 q8,2 8,8z"/><path d="M212,152 q0,-8 8,-8 l6,0 q8,2 8,8z"/></g>`,
+
+  breakfast: () => W('#FFE6D5')+windowA(24,22,'day')+clockFace(204,42,15,7,30)
+    +kid(120,66,{shirt:'#10B981',mouth:'eat',hands:[[-32,52],[16,16]]})
+    +`<line x1="124" y1="83" x2="152" y2="95" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/><ellipse cx="121" cy="82" rx="5" ry="3.2" fill="#CBD5E1"/>`+hand(136,82)
+    +`<rect y="120" width="240" height="60" fill="#F59E0B"/><rect y="120" width="240" height="7" fill="#D97706"/>`
+    +`<path d="M97,112 Q120,140 143,112Z" fill="#60A5FA"/><ellipse cx="120" cy="112" rx="23" ry="5" fill="#FFFFFF"/><circle cx="110" cy="111" r="2.4" fill="#F59E0B"/><circle cx="118" cy="110" r="2.4" fill="#F97316"/><circle cx="126" cy="112" r="2.4" fill="#F59E0B"/><circle cx="133" cy="110.5" r="2.2" fill="#F97316"/>`
+    +`<rect x="168" y="94" width="16" height="26" rx="3" fill="#FFFFFF" opacity=".85"/><rect x="169.5" y="102" width="13" height="16.5" rx="2" fill="#FFA62B"/>`
+    +`<ellipse cx="62" cy="120" rx="22" ry="5" fill="#FFFFFF"/><rect x="50" y="102" width="24" height="18" rx="6" fill="#E2A15B"/><rect x="54" y="106" width="16" height="11" rx="3" fill="#F7CF8F"/>`
+    +`<rect x="198" y="86" width="20" height="34" rx="2" fill="#FFFFFF"/><path d="M198,86 L208,76 L218,86Z" fill="#E3E8F0"/><rect x="198" y="96" width="20" height="10" fill="#60A5FA"/>`,
+
+  school: () => W('#BFE6FF')+`<circle cx="216" cy="24" r="13" fill="#FFD43B"/>`+cloud(40,28)+cloud(140,20)
+    +`<rect y="128" width="240" height="52" fill="#7ED79B"/>`
+    +`<line x1="104" y1="40" x2="104" y2="130" stroke="#7A8AA8" stroke-width="3"/><path d="M106,42 L126,48 L106,55Z" fill="#FFC83D"/>`
+    +`<rect x="122" y="62" width="104" height="70" fill="#FF9B8A"/><path d="M114,64 L174,30 L234,64Z" fill="#D9473F"/><circle cx="174" cy="51" r="8" fill="#FFFFFF"/><path d="M174,51 v-5 M174,51 h4" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/>`
+    +`<rect x="146" y="66" width="56" height="14" rx="3" fill="#FFFFFF"/><text x="174" y="77" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="11" fill="${INK}">SCHOOL</text>`
+    +`<rect x="130" y="88" width="18" height="16" rx="2" fill="#CDEBFF"/><rect x="200" y="88" width="18" height="16" rx="2" fill="#CDEBFF"/><rect x="159" y="96" width="30" height="36" rx="3" fill="#8C5A2B"/><circle cx="183" cy="115" r="2" fill="#FFD36E"/>`
+    +`<path d="M159,132 L189,132 L212,180 L136,180Z" fill="#EAD9B6"/>`
+    +kid(60,58,{s:.8,legs:true,shirt:'#3B82F6',pack:'#FFC83D',hands:[[-26,54],[32,-16]]})
+    +flower(16,150,'#FF6F61')+flower(108,156,'#8C7BEF')+flower(226,152,'#FF6F61'),
+
+  homework: () => W('#ECE7FF')+windowA(172,20,'afternoon')
+    +`<rect x="94" y="20" width="48" height="30" rx="4" fill="#FFFFFF"/><text x="118" y="42" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-size="17" font-weight="800" fill="#FF6F61">ABC</text>`
+    +`<path d="M26,84 L44,78 L76,122 L28,122Z" fill="#FFF3B0" opacity=".6"/>`
+    +kid(116,66,{shirt:'#EF4444',hands:[[-30,54],[28,52]]})
+    +`<rect y="122" width="240" height="16" fill="#A8652F"/><rect y="122" width="240" height="4" fill="#C98048"/><rect x="10" y="138" width="10" height="42" fill="#7A4520"/><rect x="220" y="138" width="10" height="42" fill="#7A4520"/><rect y="138" width="10" height="42" fill="#D8CDEB"/>`
+    +`<path d="M90,123 L116,121 L142,123 L142,126 L90,126Z" fill="#3B82F6"/><path d="M92,121 L116,119 L116,106 L94,108Z" fill="#FFFFFF" stroke="#C7CCE0"/><path d="M116,119 L140,121 L138,108 L116,106Z" fill="#FFFFFF" stroke="#C7CCE0"/><path d="M98,112 l14,-1.5 M98,116 l14,-1.5 M120,110.5 l14,1.5 M120,114.5 l14,1.5" stroke="#AEB6D3" stroke-width="1.2"/>`
+    +`<line x1="144" y1="118" x2="134" y2="108" stroke="#FFC83D" stroke-width="4" stroke-linecap="round"/><path d="M134,108 l-2,-3 3,1z" fill="${INK}"/>`+hand(144,118)
+    +`<ellipse cx="34" cy="121" rx="14" ry="4" fill="${INK}"/><path d="M34,121 L44,94 L32,78" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M18,86 L38,68 L46,80Z" fill="#FFC83D"/>`
+    +`<rect x="186" y="112" width="40" height="10" rx="2" fill="#3FB36F"/><rect x="190" y="102" width="34" height="10" rx="2" fill="#8C7BEF"/><rect x="188" y="92" width="36" height="10" rx="2" fill="#FF6F61"/>`,
+
+  play: () => W('#BFE6FF')+`<circle cx="214" cy="26" r="13" fill="#FFD43B"/>`+cloud(120,22)+cloud(186,40)
+    +`<ellipse cx="60" cy="140" rx="120" ry="30" fill="#93DFAA"/><ellipse cx="200" cy="146" rx="110" ry="28" fill="#7ED79B"/><rect y="142" width="240" height="38" fill="#7ED79B"/>`
+    +`<rect x="16" y="70" width="12" height="72" fill="#8C5A2B"/><circle cx="22" cy="60" r="24" fill="#3FB36F"/><circle cx="6" cy="76" r="14" fill="#36A062"/><circle cx="40" cy="74" r="12" fill="#36A062"/>`
+    +kid(82,62,{s:.75,legs:true,shirt:'#3B82F6',mouth:'cheer',hands:[[-30,-14],[30,-14]]})
+    +kid(166,62,{s:.75,legs:true,skin:'#A86B48',hair:'#2B1B14',pigtails:true,shirt:'#EC4899',pants:'#7C3AED',shoes:'#FFFFFF',mouth:'cheer',hands:[[-30,-14],[30,-14]]})
+    +`<circle cx="124" cy="48" r="11" fill="#FFFFFF" stroke="${INK}" stroke-width="2"/><path d="M124,43 l4.5,3.3 -1.7,5.3 -5.6,0 -1.7,-5.3z" fill="${INK}"/><path d="M108,58 q-4,-6 -2,-12 M140,58 q4,-6 2,-12" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round"/>`
+    +flower(54,160,'#FF6F61')+flower(126,166,'#FFC83D')+flower(214,162,'#8C7BEF'),
+
+  dinner: () => W('#FCE0CF')+windowA(176,20,'evening')+clockFace(36,38,15,7,0)
+    +`<line x1="110" y1="0" x2="110" y2="8" stroke="${INK}" stroke-width="2"/>`
+    +kid(116,66,{shirt:'#8B5CF6',mouth:'eat',hands:[[-32,52],[18,16]]})
+    +`<line x1="121" y1="81" x2="154" y2="96" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/><path d="M116,77 l6,3 M115,80 l6,3 M114,83 l6,3" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/><path d="M117,84 q-2,6 2,10" stroke="#FCD34D" stroke-width="2" fill="none"/>`+hand(134,82)
+    +`<rect y="120" width="240" height="60" fill="#5FA8F5"/><rect y="120" width="240" height="7" fill="#3E86D6"/>`
+    +`<ellipse cx="116" cy="121" rx="32" ry="7" fill="#FFFFFF"/><ellipse cx="116" cy="115" rx="21" ry="7" fill="#FCD34D"/><path d="M100,116 q4,-4 8,0 t8,0 t8,0 t8,0" stroke="#F59E0B" stroke-width="1.5" fill="none"/><ellipse cx="116" cy="111" rx="10" ry="3.4" fill="#E2483D"/><circle cx="110" cy="110" r="4" fill="#B4532A"/><circle cx="122" cy="110.5" r="4" fill="#B4532A"/>`
+    +`<rect x="172" y="96" width="15" height="24" rx="3" fill="#D8F1FF" stroke="#9AC9E8" stroke-width="1.5"/>`
+    +`<path d="M38,108 L76,108 L70,122 L44,122Z" fill="#C07A3E"/><ellipse cx="50" cy="106" rx="9" ry="5" fill="#E2A15B"/><ellipse cx="63" cy="105" rx="9" ry="5" fill="#EFB86E"/>`
+    +`<ellipse cx="214" cy="120" rx="16" ry="4" fill="#FFFFFF"/><path d="M204,118 q10,-18 20,0z" fill="#3FB36F"/>`,
+
+  bath: () => W('#CFF6FB')+tiles('#B5E7EF')+F('#9AD0DC',150)
+    +`<path d="M210,0 L210,24 Q210,32 200,32 L192,32" stroke="#9AA9C7" stroke-width="5" fill="none"/><path d="M178,36 L196,28 L199,39 L182,44Z" fill="#9AA9C7"/>`
+    +kid(116,84,{s:.9,shirt:SKIN,eyes:'closed',mouth:'cheer',hands:[[-34,-4],[34,-4]]})
+    +`<rect x="78" y="74" width="14" height="10" rx="3" fill="#FFC83D"/>`
+    +`<path d="M34,116 L208,116 L200,154 Q197,162 186,162 L56,162 Q45,162 42,154Z" fill="#FFFFFF" stroke="#C3CEDF" stroke-width="2"/><rect x="28" y="108" width="186" height="10" rx="5" fill="#FFFFFF" stroke="#C3CEDF" stroke-width="2"/><rect x="58" y="160" width="10" height="10" rx="3" fill="#FFC83D"/><rect x="174" y="160" width="10" height="10" rx="3" fill="#FFC83D"/>`
+    +[[52,108,9],[66,102,10],[82,106,9],[98,103,10],[114,106,11],[132,103,10],[148,106,9],[164,104,9],[186,108,8],[42,112,6],[200,111,6]].map(([x,y,r])=>bub(x,y,r)).join('')
+    +`<ellipse cx="172" cy="100" rx="12" ry="7" fill="#FFD43B"/><circle cx="179" cy="91" r="6" fill="#FFD43B"/><path d="M184,91 l6,1.5 -6,2z" fill="#FF8A3D"/><circle cx="180" cy="89.5" r="1.2" fill="${INK}"/>`
+    +bub(62,56,5)+bub(72,38,3.5)+bub(160,62,4)+bub(146,42,3)+drop(186,50)+drop(194,62),
+
+  bed: () => W('#2C3A73')+F('#463C78',146)+windowA(22,22,'night')
+    +star(110,30,4,'#FFE27A')+star(200,24,5,'#FFE27A')+star(160,44,3,'#FFE27A')
+    +`<rect x="94" y="72" width="12" height="76" rx="5" fill="#8C5A2B"/><rect x="218" y="96" width="10" height="52" rx="4" fill="#8C5A2B"/><rect x="100" y="114" width="122" height="22" rx="6" fill="#E6E9F5"/><ellipse cx="130" cy="106" rx="22" ry="10" fill="#FFFFFF"/>`
+    +kid(134,96,{s:.75,noArms:true,shirt:'#A78BFA',eyes:'closed',mouth:'smile',rot:-14})
+    +`<path d="M110,110 Q160,100 222,106 L222,140 Q160,146 110,140Z" fill="#F472B6"/>`+star(140,124,5,'#FFFFFF')+star(172,120,4,'#FFFFFF')+star(202,128,5,'#FFFFFF')
+    +`<g font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" fill="#FFF1A8"><text x="160" y="84" font-size="20">Z</text><text x="176" y="68" font-size="15">z</text><text x="188" y="56" font-size="11">z</text></g>`
+    +`<g transform="translate(56 136)"><circle cx="-9" cy="-24" r="5" fill="#B07A4A"/><circle cx="9" cy="-24" r="5" fill="#B07A4A"/><circle cy="-16" r="11" fill="#C08A5A"/><ellipse cy="4" rx="13" ry="14" fill="#C08A5A"/><circle cx="-4" cy="-18" r="1.6" fill="${INK}"/><circle cx="4" cy="-18" r="1.6" fill="${INK}"/><ellipse cy="-13" rx="3.5" ry="2.5" fill="#E8C9A6"/></g>`,
+};
+
+function heroSvg(){
+  return `<svg viewBox="0 0 240 180" role="img" aria-label="Leo waving hello" xmlns="http://www.w3.org/2000/svg">${W('#BFE6FF')}
+  <g transform="translate(196 38)"><g stroke="#FF9F1C" stroke-width="3" stroke-linecap="round"><path d="M0,-26v-6M0,26v6M-26,0h-6M26,0h6M-18,-18l-4,-4M18,18l4,4M18,-18l4,-4M-18,18l-4,4"/></g><circle r="18" fill="#FFC83D"/><circle cx="-6" cy="-3" r="2" fill="${INK}"/><circle cx="6" cy="-3" r="2" fill="${INK}"/><path d="M-6,5 q6,6 12,0" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+  ${cloud(44,30)}${cloud(120,18)}
+  <ellipse cx="70" cy="150" rx="130" ry="30" fill="#93DFAA"/><rect y="148" width="240" height="32" fill="#7ED79B"/>
+  <rect x="150" y="84" width="66" height="62" fill="#FFF0C7"/><path d="M142,88 L183,56 L224,88Z" fill="#FF6F61"/><rect x="174" y="110" width="18" height="36" rx="2" fill="#8C5A2B"/><rect x="156" y="96" width="14" height="12" rx="2" fill="#9ED8F7"/><rect x="198" y="96" width="14" height="12" rx="2" fill="#9ED8F7"/>
+  ${kid(92,62,{s:.78,legs:true,shirt:'#3B82F6',mouth:'cheer',hands:[[-26,54],[34,-18]]})}
+  ${flower(22,160,'#FF6F61')}${flower(40,166,'#8C7BEF')}${flower(140,162,'#FFC83D')}${flower(226,164,'#FF6F61')}
+  </svg>`;
+}
+
+/* ---------- data ---------- */
+const PARTS = {
+  morning:{label:'Morning', phrase:'in the morning', b:'#FFE7A3', bs:'#E2B33A'},
+  afternoon:{label:'Afternoon', phrase:'in the afternoon', b:'#FFD3B3', bs:'#E39560'},
+  evening:{label:'Evening', phrase:'in the evening', b:'#D3CCFF', bs:'#8E80E0'},
+};
+const ACTS = [
+  {id:'wake', text:'I wake up.', h:7, m:0, part:'morning', said:"seven o'clock"},
+  {id:'teeth', text:'I brush my teeth.', h:7, m:5, part:'morning', said:'seven oh five'},
+  {id:'face', text:'I wash my face.', h:7, m:10, part:'morning', said:'seven ten'},
+  {id:'dress', text:'I get dressed.', h:7, m:15, part:'morning', said:'seven fifteen'},
+  {id:'breakfast', text:'I eat breakfast.', h:7, m:30, part:'morning', said:'seven thirty'},
+  {id:'school', text:'I go to school.', h:8, m:0, part:'morning', said:"eight o'clock"},
+  {id:'homework', text:'I do my homework.', h:4, m:0, part:'afternoon', said:"four o'clock"},
+  {id:'play', text:'I play with my friends.', h:5, m:0, part:'afternoon', said:"five o'clock"},
+  {id:'dinner', text:'I eat dinner.', h:7, m:0, part:'evening', said:"seven o'clock"},
+  {id:'bath', text:'I take a bath.', h:7, m:30, part:'evening', said:'seven thirty'},
+  {id:'bed', text:'I go to bed.', h:8, m:30, part:'evening', said:'eight thirty'},
+];
+const timeStr = a => `${a.h}:${String(a.m).padStart(2,'0')}`;
+const art = id => { const a=ACTS.find(x=>x.id===id); return `<svg viewBox="0 0 240 180" role="img" aria-label="${a?a.text:''}" xmlns="http://www.w3.org/2000/svg">${SCENES[id]()}</svg>`; };
+const clockSvg = a => `<svg viewBox="-50 -50 100 100" aria-hidden="true">${clockFace(0,0,43,a.h,a.m)}</svg>`;
+
+const MODES = [
+  {id:'learn', pic:'wake', c:'#FFC83D', title:'Look & Listen', sub:"Learn the words for Leo's day."},
+  {id:'find', pic:'teeth', c:'#8C7BEF', title:'Listen & Find', sub:'Hear it, then tap the right picture.'},
+  {id:'order', pic:'breakfast', c:'#3FB36F', title:'Put in Order', sub:'What comes first? What comes next?'},
+  {id:'when', pic:'bed', c:'#FF6F61', title:'When Do I Do It?', sub:'Morning, afternoon or evening?'},
+];
+
+const SPK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+const MUTED = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${INK}"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="#FF6F61" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+const SOUND = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${INK}"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+const STAR = (lit) => `<svg viewBox="0 0 24 24" class="${lit?'lit':''}" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 17.2l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="${lit?'#FFC83D':'#E3EEF9'}" stroke="${lit?'#E6A019':'#C9DDF1'}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+const ARROW = d => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d==='l'?'M15 5l-7 7 7 7':'M9 5l7 7-7 7'}" stroke="${INK}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function partIcon(p){
+  if(p==='morning') return `<svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#E6A019" stroke-width="3" stroke-linecap="round"><path d="M24 8v5M10 16l3.5 3.5M38 16l-3.5 3.5M4 30h5M39 30h5"/></g><path d="M12 34a12 12 0 0 1 24 0Z" fill="#FFC83D"/><path d="M5 36h38" stroke="#3FB36F" stroke-width="4" stroke-linecap="round"/></svg>`;
+  if(p==='afternoon') return `<svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FF9F1C" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9 9l3.5 3.5M35.5 35.5L39 39M39 9l-3.5 3.5M12.5 35.5L9 39"/></g><circle cx="24" cy="24" r="11" fill="#FF9F1C"/></svg>`;
+  return `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="22" cy="25" r="15" fill="#FFE27A"/><circle cx="29" cy="20" r="13" fill="var(--b)"/>${star(38,10,5,'#FFFFFF')}${star(10,8,3.5,'#FFFFFF')}</svg>`;
+}
+
+/* ---------- sound & speech ---------- */
+let muted=false, voice=null, AC=null;
+function pickVoice(){try{const vs=speechSynthesis.getVoices();voice=vs.find(v=>/en[-_]US/i.test(v.lang)&&/samantha|aria|jenny|zira|google us|female/i.test(v.name))||vs.find(v=>/en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}catch(e){}}
+try{ if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;} }catch(e){}
+function say(t, delay=0){
+  if(muted) return;
+  const go=()=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.82;u.pitch=1.15;if(voice)u.voice=voice;speechSynthesis.speak(u);}catch(e){}};
+  delay?setTimeout(go,delay):go();
+}
+function hush(){try{speechSynthesis.cancel();}catch(e){}}
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}return AC;}
+function beep(seq){
+  const c=ac(); if(!c||muted) return; try{c.resume&&c.resume();}catch(e){}
+  let t=c.currentTime+.01;
+  seq.forEach(([f,d,type,v])=>{const o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(v||.14,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d);t+=d*.65;});
+}
+const ding = () => beep([[660,.14],[880,.14],[1320,.32]]);
+const plink = () => beep([[990,.12],[1320,.18]]);
+const buzz = () => beep([[230,.2,'triangle',.18],[170,.28,'triangle',.18]]);
+function setMuteIcon(){const b=$('#muteBtn');b.innerHTML=muted?MUTED:SOUND;b.setAttribute('aria-label',muted?'Sound off':'Sound on');}
+
+/* ---------- stars, cheers, confetti ---------- */
+let stars=0; try{stars=parseInt(localStorage.getItem('leo-stars')||'0',10)||0;}catch(e){}
+function addStars(n){stars+=n;try{localStorage.setItem('leo-stars',String(stars));}catch(e){}$('#starCount').textContent=stars;const p=$('#pill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump');}
+const YAY=['Great job!','Super!','Well done!','Awesome!','You got it!','Fantastic!'];
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+let cheerT;
+function cheer(text,bad){const c=$('#cheer');c.textContent=text;c.classList.toggle('bad',!!bad);c.classList.add('show');clearTimeout(cheerT);cheerT=setTimeout(()=>c.classList.remove('show'),1000);}
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function confetti(){
+  if(reduce) return;
+  const cv=$('#fx'), x=cv.getContext('2d'), d=window.devicePixelRatio||1, w=innerWidth, h=innerHeight;
+  cv.width=w*d; cv.height=h*d; x.setTransform(d,0,0,d,0,0);
+  const cols=['#FFC83D','#FF6F61','#3FB36F','#8C7BEF','#5FA8F5','#F472B6'];
+  const ps=Array.from({length:150},()=>({x:Math.random()*w,y:-20-Math.random()*h*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*7,c:rnd(cols),r:Math.random()*6,vr:(Math.random()-.5)*.3}));
+  const t0=performance.now();
+  (function f(t){x.clearRect(0,0,w,h);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore();});if(t-t0<3200)requestAnimationFrame(f);else x.clearRect(0,0,w,h);})(t0);
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const progress = (n,cur) => `<div class="progress" aria-label="Question ${cur+1} of ${n}">${Array.from({length:n},(_,k)=>`<i class="${k<cur?'on':k===cur?'now':''}"></i>`).join('')}</div>`;
+
+/* ---------- screens ---------- */
+let G={};
+let timers=[];
+const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
+function go(view){
+  timers.forEach(clearTimeout); timers=[]; hush();
+  $('#homeBtn').hidden = view==='home';
+  VIEWS[view]();
+  try{window.scrollTo(0,0);}catch(e){}
+}
+
+function home(){
+  G={type:'home'};
+  screen.innerHTML=`
+  <div style="display:flex;flex-direction:column;gap:18px">
+  <section class="hero panel">
+    <div class="art">${heroSvg()}</div>
+    <div>
+      <span class="eyebrow">My daily routine</span>
+      <h1>Hi! I'm Leo.</h1>
+      <p>Come and see my busy day. Then play the games and win stars!</p>
+      <button class="btn" data-act="hello">${SPK} Say hello</button>
+    </div>
+  </section>
+  <section class="modes">
+    ${MODES.map(m=>`<button class="mode" style="--c:${m.c}" data-act="mode" data-mode="${m.id}"><div class="art">${art(m.pic)}</div><h3>${m.title}</h3><p>${m.sub}</p></button>`).join('')}
+  </section></div>`;
+}
+
+function learn(i=0){
+  G={type:'learn', i};
+  const a=ACTS[i], words=a.text.split(' ');
+  screen.innerHTML=`
+  <section class="panel learn">
+    <div class="art" id="learnArt">${art(a.id)}</div>
+    <div>
+      <span class="eyebrow">Leo says · ${i+1} of ${ACTS.length}</span>
+      <h2 class="phrase">${words.map((w,k)=>`<button class="word${k===1?' verb':''}" data-act="word" data-w="${w.replace('.','')}">${w}</button>`).join('')}</h2>
+      <button class="timechip" data-act="sayTime" aria-label="Hear the time">${clockSvg(a)}<span><b>${timeStr(a)}</b>${PARTS[a.part].phrase}</span></button>
+      <div class="learnbtns"><button class="btn" data-act="sayPhrase">${SPK} Listen</button></div>
+      <div class="navrow">
+        <button class="arrow" data-act="prev" aria-label="Back" ${i===0?'disabled':''}>${ARROW('l')}</button>
+        <div class="dots">${ACTS.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div>
+        <button class="arrow" data-act="next" aria-label="Next">${ARROW('r')}</button>
+      </div>
+    </div>
+  </section>`;
+  say(a.text, 150);
+}
+
+function find(){ G={type:'find', rounds:shuffle(ACTS).slice(0,8), r:0, got:0}; findRound(); }
+function findRound(){
+  const t=G.rounds[G.r];
+  G.choices=shuffle([t,...shuffle(ACTS.filter(x=>x!==t)).slice(0,2)]); G.tries=0; G.lock=false;
+  G.promptSay=t.text;
+  screen.innerHTML=`
+  <section class="panel">
+    ${progress(G.rounds.length,G.r)}
+    <div class="prompt"><button class="speak" data-act="sayPrompt" aria-label="Listen again">${SPK}</button><div><span class="eyebrow">Listen and find</span><strong>${t.text}</strong></div></div>
+    <div class="choices">${G.choices.map((c,k)=>`<button class="pick" data-act="pick" data-k="${k}" aria-label="${c.text}"><div class="art">${art(c.id)}</div></button>`).join('')}</div>
+  </section>`;
+  say(t.text, 250);
+}
+
+const ORDER_LBL=['First','Then','Next','Last'];
+const ORDER_ASK=['What does Leo do first?','What does he do then?','What comes next?','What does he do last?'];
+function order(){ G={type:'order', r:0, rounds:4, got:0}; orderRound(); }
+function orderRound(){
+  const idx=shuffle([...ACTS.keys()]).slice(0,4).sort((a,b)=>a-b);
+  G.seq=idx.map(i=>ACTS[i]); G.cards=shuffle(G.seq); G.next=0;
+  G.promptSay="Put Leo's day in order. "+ORDER_ASK[0];
+  screen.innerHTML=`
+  <section class="panel">
+    ${progress(G.rounds,G.r)}
+    <div class="prompt"><button class="speak" data-act="sayPrompt" aria-label="Listen again">${SPK}</button><div><span class="eyebrow">Put in order · look at the clocks</span><strong id="orderAsk">${ORDER_ASK[0]}</strong></div></div>
+    <div class="slots">${ORDER_LBL.map((l,k)=>`<div class="slot" id="slot${k}"><span class="lbl">${l}</span><div class="slot-art">${k+1}</div></div>`).join('')}</div>
+    <div class="cards">${G.cards.map((a,k)=>`<button class="pick card" data-act="ocard" data-k="${k}"><div class="art">${art(a.id)}</div><span class="cap"><b>${a.text}</b><em>${timeStr(a)}</em></span></button>`).join('')}</div>
+    <div class="after" id="after" hidden><button class="btn green" data-act="onext">${G.r<G.rounds-1?'Next round':'Finish'} ${ARROW('r').replace(INK,'#FFFFFF')}</button></div>
+  </section>`;
+  say(G.promptSay, 250);
+}
+
+function when(){ G={type:'when', rounds:shuffle(ACTS).slice(0,8), r:0, got:0}; whenRound(); }
+function whenRound(){
+  const t=G.rounds[G.r]; G.tries=0; G.lock=false;
+  G.promptSay=t.text+' When do I do it?';
+  screen.innerHTML=`
+  <section class="panel">
+    ${progress(G.rounds.length,G.r)}
+    <div class="when">
+      <div class="art">${art(t.id)}</div>
+      <div>
+        <div class="prompt" style="margin-bottom:6px"><button class="speak" data-act="sayPrompt" aria-label="Listen again">${SPK}</button><div><span class="eyebrow">When do I do it?</span><strong>${t.text}</strong></div></div>
+        <div class="bins">${Object.entries(PARTS).map(([k,p])=>`<button class="bin" style="--b:${p.b};--bs:${p.bs}" data-act="bin" data-p="${k}">${partIcon(k)}${p.label}</button>`).join('')}</div>
+        <div class="sentence" id="sentence" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>`;
+  say(G.promptSay, 250);
+}
+
+function done(type, got, total, msg){
+  G={type:'done', from:type};
+  screen.innerHTML=`
+  <section class="panel done">
+    <div class="art">${art('play')}</div>
+    <h2>${got===total?'Perfect!':'Great job!'}</h2>
+    <p>${msg||`You got ${got} ${got===1?'star':'stars'}!`}</p>
+    <div class="starrow">${Array.from({length:total},(_,k)=>STAR(k<got).replace('class="lit"',`class="lit" style="animation-delay:${k*90}ms"`)).join('')}</div>
+    <div class="donebtns">
+      <button class="btn green" data-act="mode" data-mode="${type}">Play again</button>
+      <button class="btn white" data-act="home">More games</button>
+    </div>
+  </section>`;
+  confetti(); ding();
+  say((got===total?'Perfect! ':'Great job! ')+(msg||`You got ${got} ${got===1?'star':'stars'}!`), 300);
+}
+
+const VIEWS={home, learn:()=>learn(0), find, order, when};
+
+/* ---------- actions ---------- */
+const H={
+  home:()=>go('home'),
+  mode:b=>go(b.dataset.mode),
+  hello:()=>say("Hi! I'm Leo. Come and see my busy day!"),
+  mute:()=>{muted=!muted;if(muted)hush();setMuteIcon();},
+  word:b=>say(b.dataset.w),
+  sayPhrase:()=>say(ACTS[G.i].text),
+  sayTime:()=>{const a=ACTS[G.i];say(`At ${a.said}, ${PARTS[a.part].phrase}.`);},
+  prev:()=>{if(G.i>0){hush();learn(G.i-1);}},
+  next:()=>{hush();if(G.i<ACTS.length-1)learn(G.i+1);else{addStars(3);done('learn',3,3,"You learned Leo's whole day!");}},
+  sayPrompt:()=>say(G.promptSay),
+  pick:b=>{
+    if(G.lock) return;
+    const c=G.choices[+b.dataset.k], t=G.rounds[G.r];
+    if(c===t){
+      G.lock=true; b.classList.add('right'); ding();
+      if(G.tries===0){G.got++;addStars(1);}
+      const y=rnd(YAY); cheer(y); say(y+' '+t.text);
+      later(()=>{G.r++; G.r<G.rounds.length?findRound():done('find',G.got,G.rounds.length);},1900);
+    } else {
+      G.tries++; b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong'); buzz(); cheer('Try again!',true); say('Try again! '+t.text);
+    }
+  },
+  ocard:b=>{
+    if(G.next>=4) return;
+    const a=G.cards[+b.dataset.k];
+    if(a===G.seq[G.next]){
+      const s=$('#slot'+G.next); s.classList.add('filled'); s.querySelector('.slot-art').innerHTML=art(a.id);
+      b.classList.add('used'); G.next++;
+      if(G.next<4){ plink(); $('#orderAsk').textContent=ORDER_ASK[G.next]; say(`${ORDER_LBL[G.next-1]}, ${a.text}`); }
+      else {
+        ding(); G.got++; addStars(1); cheer(rnd(YAY)); confetti();
+        $('#orderAsk').textContent='You did it! Listen to Leo.';
+        G.promptSay=G.seq.map((x,k)=>`${ORDER_LBL[k]}, ${x.text}`).join(' ');
+        say(G.promptSay, 200);
+        $('#after').hidden=false;
+      }
+    } else {
+      b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong'); buzz(); cheer('Try again!',true); say('Oops! Look at the clock.');
+      later(()=>b.classList.remove('wrong'),600);
+    }
+  },
+  onext:()=>{hush();G.r++;G.r<G.rounds?orderRound():done('order',G.got,G.rounds);},
+  bin:b=>{
+    if(G.lock) return;
+    const t=G.rounds[G.r];
+    if(b.dataset.p===t.part){
+      G.lock=true; b.classList.add('right'); ding();
+      if(G.tries===0){G.got++;addStars(1);}
+      const sent=`${t.text.slice(0,-1)} ${PARTS[t.part].phrase}.`;
+      $('#sentence').textContent=sent; cheer(rnd(YAY)); say(sent);
+      later(()=>{G.r++; G.r<G.rounds.length?whenRound():done('when',G.got,G.rounds.length);},2400);
+    } else {
+      G.tries++; b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong'); buzz(); cheer('Try again!',true); say('Try again!');
+    }
+  },
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;ac();const f=H[b.dataset.act];if(f)f(b);});
+document.addEventListener('keydown',e=>{if(G.type!=='learn')return;if(e.key==='ArrowRight')H.next();if(e.key==='ArrowLeft')H.prev();});
+
+$('#starCount').textContent=stars;
+setMuteIcon();
+const start=()=>go('home');
+if(window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start();
+})();
+</script>
