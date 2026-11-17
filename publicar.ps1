@@ -1,6 +1,6 @@
 # Leo's Busy Day - arma index.html a partir de leos-busy-day.html y lo sube a GitHub.
 # Uso:  powershell -ExecutionPolicy Bypass -File publicar.ps1 ["mensaje del cambio"]
-# Render (Static Site) redespliega solo al recibir el commit.
+# Después: en Render (static site leos-busy-day) pulsar Manual Deploy > Deploy latest commit.
 
 param([string]$Mensaje = "Actualizar Leo's Busy Day")
 
